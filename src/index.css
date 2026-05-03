@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cobalt-500: #2563EB;
+  --color-cobalt-600: #0047AB;
+  --color-cobalt-700: #003580;
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--color-white);
+  color: var(--color-gray-900);
+  -webkit-font-smoothing: antialiased;
+}
