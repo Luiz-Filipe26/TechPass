@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { User, Ticket } from "lucide-react";
+import { Ticket } from "lucide-react";
+import { UserMenu } from "./UserMenu";
 
 export function Header() {
     return (
@@ -25,13 +26,7 @@ export function Header() {
 
                     <div className="w-px h-4 bg-gray-300"></div>
 
-                    <Link
-                        to="/profile"
-                        className="group text-lg font-medium text-gray-600 hover:text-cobalt-600 transition-colors flex items-center gap-2"
-                    >
-                        <User className="w-5 h-5 text-gray-400 group-hover:text-cobalt-600 transition-colors" />
-                        Meu Perfil
-                    </Link>
+                    <UserMenu />
                 </nav>
             </div>
         </header>

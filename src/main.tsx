@@ -3,9 +3,10 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { RootLayout } from "./layouts/RootLayout";
 import { HomePage } from "./pages/HomePage";
+import { LoginPage } from "./pages/LoginPage";
 import { getTracks } from "./services/trackService";
-import "./index.css";
 import { getEventStats } from "./services/eventService";
+import "./index.css";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
                         statsPromise: getEventStats(),
                     };
                 },
+            },
+            {
+                path: "login",
+                element: <LoginPage />,
             },
         ],
     },
