@@ -22,10 +22,13 @@ export function TrackCard({ id, title, description, imageUrl }: TrackCardProps) 
             </div>
 
             <div className="p-6 relative bg-white">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-cobalt-600 transition-colors">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-cobalt-600 transition-colors leading-tight">
                     {title}
                 </h3>
-                <p className="text-gray-600 text-sm line-clamp-2">{description}</p>
+
+                <p className="text-gray-700 text-base line-clamp-2 leading-relaxed">
+                    {description}
+                </p>
             </div>
         </Link>
     );

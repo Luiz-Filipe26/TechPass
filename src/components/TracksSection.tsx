@@ -1,4 +1,3 @@
-// src/components/TracksSection.tsx
 import { Suspense } from "react";
 import { Await } from "react-router-dom";
 import { TrackGrid } from "./TrackGrid";
@@ -11,9 +10,9 @@ interface TracksSectionProps {
 
 export function TracksSection({ tracksPromise }: TracksSectionProps) {
     return (
-        <section id="tracks" className="bg-gray-50 py-24 border-t border-gray-200 flex-1">
+        <section id="tracks" className="bg-gray-50 pt-10 pb-16 md:pt-10 md:pb-24 border-t border-gray-200 flex-1">
             <div className="max-w-7xl mx-auto px-4">
-                <div className="text-center mb-16">
+                <div className="text-center mb-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                         Escolha seu Caminho
                     </h2>

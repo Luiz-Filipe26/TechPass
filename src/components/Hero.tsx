@@ -1,6 +1,6 @@
 export function Hero() {
     return (
-        <section className="relative bg-cobalt-900 text-white overflow-hidden py-12 lg:py-18">
+        <section className="relative bg-cobalt-900 text-white overflow-hidden py-10 lg:py-12">
             {/* Brilho de fundo sutil para não ficar chapado */}
             <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"></div>
 
@@ -13,9 +13,9 @@ export function Hero() {
                         </div>
 
                         <h1 className="text-5xl lg:text-7xl font-black tracking-tighter mb-6 leading-tight">
-                            TechPass{" "}
+                            Urban Innovation{" "}
                             <span className="text-transparent bg-clip-text bg-linear-to-r from-white via-cobalt-100 to-blue-400">
-                                2026
+                                Summit
                             </span>
                         </h1>
 
