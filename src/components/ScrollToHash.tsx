@@ -6,18 +6,17 @@ export function ScrollToHash() {
     const isInitialLoad = useRef(true);
     const lastPathname = useRef(pathname);
 
-    useEffect(() => {
-        if (hash) {
-            const element = document.getElementById(hash.replace("#", ""));
-            
-            if (element) {
-                const isSamePage = lastPathname.current === pathname;
-                const behavior = (isInitialLoad.current || !isSamePage) ? "auto" : "smooth";
+    const scrollToHash = () => {
+        if (!hash) return;
+        const element = document.getElementById(hash.replace("#", ""));
+        if (!element) return;
+        const isSamePage = lastPathname.current === pathname;
+        const behavior = isInitialLoad.current || !isSamePage ? "auto" : "smooth";
+        element.scrollIntoView({ behavior });
+    };
 
-                element.scrollIntoView({ behavior });
-            }
-        }
-        
+    useEffect(() => {
+        scrollToHash();
         isInitialLoad.current = false;
         lastPathname.current = pathname;
     }, [pathname, hash]);

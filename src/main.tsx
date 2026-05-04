@@ -4,9 +4,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { RootLayout } from "./layouts/RootLayout";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
-import { getTracks } from "./services/trackService";
+import { TrackDetailsPage } from "./pages/TrackDetailsPage"; // Importação nova
+import { getTracks, getTrackById } from "./services/trackService"; // Importação atualizada
 import { getEventStats } from "./services/eventService";
 import "./index.css";
+import { TicketProvider } from "./contexts/TicketContext";
 
 const router = createBrowserRouter([
     {
@@ -27,12 +29,24 @@ const router = createBrowserRouter([
                 path: "login",
                 element: <LoginPage />,
             },
+            {
+                path: "tracks/:id",
+                element: <TrackDetailsPage />,
+                loader: ({ params }) => {
+                    if (!params.id) throw new Error("ID da trilha é obrigatório");
+                    return {
+                        trackPromise: getTrackById(params.id),
+                    };
+                },
+            },
         ],
     },
 ]);
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <RouterProvider router={router} />
+        <TicketProvider>
+            <RouterProvider router={router} />
+        </TicketProvider>
     </StrictMode>,
 );

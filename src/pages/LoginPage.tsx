@@ -1,8 +1,8 @@
 import { useState, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Ticket, Loader2, Check, X } from "lucide-react";
-import { InputField } from "../components/InputField";
+import { InputField } from "@/components/InputField";
 
 const AuthMode = {
     LOGIN: "LOGIN",

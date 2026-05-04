@@ -8,3 +8,16 @@ export async function getTracks(): Promise<Track[]> {
         }, 800);
     });
 }
+
+export async function getTrackById(id: string): Promise<Track> {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const track = MOCK_TRACKS.find((t) => t.id === id);
+            if (!track) {
+                reject(new Error("Trilha não encontrada"));
+            } else {
+                resolve(track);
+            }
+        }, 600);
+    });
+}

@@ -1,9 +1,9 @@
 import { useLoaderData } from "react-router-dom";
-import { Hero } from "../components/Hero";
-import { AboutSection } from "../components/AboutSection";
-import { TracksSection } from "../components/TracksSection";
-import type { Track } from "../types/track";
-import type { EventStat } from "../types/event";
+import { Hero } from "@/components/Hero";
+import { AboutSection } from "@/components/AboutSection";
+import { TracksSection } from "@/components/TracksSection";
+import type { Track } from "@/types/track";
+import type { EventStat } from "@/types/event";
 
 export function HomePage() {
     const data = useLoaderData() as {
