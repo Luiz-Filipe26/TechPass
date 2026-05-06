@@ -33,7 +33,7 @@ function TrackDetailsSkeleton() {
 function TrackDetailsContent(props: { track: Track }) {
     const { track } = props;
 
-    const { isEnrolled } = useTickets();
+    const { isEnrolled, tickets } = useTickets();
     const userHasAccess = isEnrolled(track.id);
 
     const keynoteSession = track.sessions.find((s) => s.isKeynote);
@@ -50,6 +50,10 @@ function TrackDetailsContent(props: { track: Track }) {
                     <div className="space-y-4">
                         {track.sessions.map((session) => {
                             const isLocked = !userHasAccess && !session.isKeynote;
+                            const isReserved = tickets.some((t) => t.sessionId === session.id);
+                            
+                            // Nova lógica: Verifica se a sessão está esgotada
+                            const isSoldOut = session.reserved >= session.capacity;
 
                             return (
                                 <SessionCard
@@ -57,6 +61,8 @@ function TrackDetailsContent(props: { track: Track }) {
                                     session={session}
                                     trackId={track.id}
                                     isDisabled={isLocked}
+                                    isReserved={isReserved}
+                                    isSoldOut={isSoldOut}
                                 />
                             );
                         })}

@@ -29,6 +29,8 @@ export interface Ticket {
     id: string;
     trackId: string;
     trackTitle: string;
+    sessionId: string;
+    sessionTitle: string;
     seatId: string | null;
     category: "vip" | "standard" | "general";
     purchaseDate: string;

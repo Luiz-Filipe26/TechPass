@@ -21,17 +21,13 @@ export function TicketProvider({ children }: { children: ReactNode }) {
     };
 
     const addTicket = (ticket: Ticket) => {
-        if (tickets.some((t) => t.trackId === ticket.trackId)) return;
+        if (tickets.some((t) => t.sessionId === ticket.sessionId)) return;
         commitTicketsChange([...tickets, ticket]);
     };
 
-    const isEnrolled = (trackId: string) => tickets.some((t) => t.trackId === trackId);
+    const isEnrolled = (trackId: string) => tickets.some((t) => t.trackId === trackId && t.category !== "general");
 
-    return (
-        <TicketContext.Provider value={{ tickets, addTicket, isEnrolled }}>
-            {children}
-        </TicketContext.Provider>
-    );
+    return <TicketContext.Provider value={{ tickets, addTicket, isEnrolled }}>{children}</TicketContext.Provider>;
 }
 
 export function useTickets() {

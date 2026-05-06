@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Calendar, Clock, Lock } from "lucide-react";
+import { Calendar, Clock, Lock, CheckCircle2, XCircle } from "lucide-react";
 import type { Session } from "../types/track";
 import { formatMap, levelMap } from "../utils/badges";
 import { AvailabilityIndicator } from "./AvailabilityIndicator";
@@ -8,6 +8,8 @@ interface SessionCardProps {
     session: Session;
     trackId: string;
     isDisabled: boolean;
+    isReserved?: boolean;
+    isSoldOut?: boolean;
 }
 
 function SessionTimeInfo({ date, time }: { date: string; time: string }) {
@@ -27,23 +29,48 @@ function SessionTimeInfo({ date, time }: { date: string; time: string }) {
     );
 }
 
-function SessionMainContent({ session, isDisabled }: { session: Session; isDisabled: boolean }) {
+function SessionMainContent({
+    session,
+    isDisabled,
+    isReserved,
+    isSoldOut,
+}: {
+    session: Session;
+    isDisabled: boolean;
+    isReserved?: boolean;
+    isSoldOut?: boolean;
+}) {
     const format = formatMap[session.format];
     const level = levelMap[session.level];
 
     return (
-        <div className="flex-1">
-            <div className="flex flex-wrap gap-2 mb-3">
-                <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md ${format.color}`}>
-                    {format.label}
-                </span>
-                <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md ${level.color}`}>
-                    {level.label}
-                </span>
+        <div className="flex-1 w-full">
+            <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+                <div className="flex flex-wrap gap-2">
+                    <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md ${format.color}`}>
+                        {format.label}
+                    </span>
+                    <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md ${level.color}`}>
+                        {level.label}
+                    </span>
+                </div>
+
+                {/* Status Destacado (Prioridade: Vaga Garantida > Esgotado) */}
+                {isReserved ? (
+                    <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md relative z-20">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Vaga Garantida
+                    </span>
+                ) : isSoldOut ? (
+                    <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md relative z-20">
+                        <XCircle className="w-4 h-4" />
+                        Esgotado
+                    </span>
+                ) : null}
             </div>
 
             <h4 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                {isDisabled && <Lock className="w-5 h-5 text-gray-400" />}
+                {isDisabled && !isReserved && !isSoldOut && <Lock className="w-5 h-5 text-gray-400" />}
                 {session.title}
             </h4>
 
@@ -54,20 +81,44 @@ function SessionMainContent({ session, isDisabled }: { session: Session; isDisab
     );
 }
 
-export function SessionCard({ session, trackId, isDisabled }: SessionCardProps) {
-    const CardContainer = isDisabled ? "div" : Link;
+export function SessionCard({ session, trackId, isDisabled, isReserved, isSoldOut }: SessionCardProps) {
+    // Nova lógica de Hover Title com as prioridades corretas
+    const hoverTitle = isReserved
+        ? "Sua vaga já está garantida para esta sessão!"
+        : isSoldOut
+        ? "Infelizmente as vagas para esta sessão esgotaram."
+        : isDisabled
+        ? "Você precisa garantir o passe da trilha no Keynote antes de reservar esta sessão."
+        : `Clique para reservar vaga em: ${session.title}`;
 
-    const containerStyles = `block rounded-2xl border p-6 transition-all ${isDisabled
-            ? "bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed grayscale-50"
-            : "bg-white border-gray-200 hover:border-cobalt-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
-        }`;
+    const baseContainerStyles = "relative block overflow-hidden rounded-2xl border transition-all bg-white";
+
+    // O card inativa se estiver Desabilitado, Reservado ou Esgotado
+    const isInactive = isDisabled || isReserved || isSoldOut;
+
+    if (isInactive) {
+        return (
+            <div className={`${baseContainerStyles} border-gray-300 cursor-default`} title={hoverTitle}>
+                <div className="absolute inset-0 bg-gray-400/30 pointer-events-none z-10"></div>
+
+                <div className="p-6 flex flex-col md:flex-row gap-6 relative z-0">
+                    <SessionTimeInfo date={session.date} time={session.time} />
+                    <SessionMainContent session={session} isDisabled={isDisabled} isReserved={isReserved} isSoldOut={isSoldOut} />
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <CardContainer to={isDisabled ? "" : `/tracks/${trackId}/sessions/${session.id}`} className={containerStyles}>
-            <div className="flex flex-col md:flex-row gap-6">
+        <Link
+            to={`/tracks/${trackId}/sessions/${session.id}`}
+            className={`${baseContainerStyles} border-gray-200 hover:border-cobalt-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer`}
+            title={hoverTitle}
+        >
+            <div className="p-6 flex flex-col md:flex-row gap-6 relative z-0">
                 <SessionTimeInfo date={session.date} time={session.time} />
-                <SessionMainContent session={session} isDisabled={isDisabled} />
+                <SessionMainContent session={session} isDisabled={isDisabled} isReserved={isReserved} isSoldOut={isSoldOut} />
             </div>
-        </CardContainer>
+        </Link>
     );
 }

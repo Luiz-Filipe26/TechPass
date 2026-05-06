@@ -8,9 +8,9 @@ import { TrackDetailsPage } from "./pages/TrackDetailsPage"; // Importação nov
 import { getTracks, getTrackById } from "./services/trackService"; // Importação atualizada
 import { getEventStats } from "./services/eventService";
 import "./index.css";
-import { TicketProvider } from "./contexts/TicketContext";
-import { AuthProvider } from "./contexts/AuthContext";
 import { SessionDetailsPage } from "./pages/SessionDetailsPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 const router = createBrowserRouter([
     {
@@ -50,6 +50,14 @@ const router = createBrowserRouter([
                     if (!session) throw new Error("Sessão não encontrada");
                     return { track, session };
                 },
+            },
+            {
+                path: "checkout",
+                element: <CheckoutPage />,
+            },
+            {
+                path: "profile",
+                element: <ProfilePage />,
             },
         ],
     },
