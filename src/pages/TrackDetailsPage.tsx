@@ -32,27 +32,34 @@ function TrackDetailsSkeleton() {
 
 function TrackDetailsContent(props: { track: Track }) {
     const { track } = props;
-    const { isEnrolled, enrollInTrack } = useTickets();
+
+    const { isEnrolled } = useTickets();
     const userHasAccess = isEnrolled(track.id);
+
+    const keynoteSession = track.sessions.find((s) => s.isKeynote);
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             <TrackHero track={track} />
 
             <main className="max-w-5xl mx-auto px-4 py-12">
-                <EnrollmentCTA track={track} isEnrolled={userHasAccess} onEnroll={() => enrollInTrack(track.id)} />
+                <EnrollmentCTA track={track} isEnrolled={userHasAccess} keynoteId={keynoteSession?.id} />
 
                 <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Agenda da Trilha</h3>
                     <div className="space-y-4">
-                        {track.sessions.map((session) => (
-                            <SessionCard
-                                key={session.id}
-                                session={session}
-                                trackId={track.id}
-                                isDisabled={!userHasAccess}
-                            />
-                        ))}
+                        {track.sessions.map((session) => {
+                            const isLocked = !userHasAccess && !session.isKeynote;
+
+                            return (
+                                <SessionCard
+                                    key={session.id}
+                                    session={session}
+                                    trackId={track.id}
+                                    isDisabled={isLocked}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             </main>

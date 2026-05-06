@@ -1,5 +1,5 @@
 import { useState, type SyntheticEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Adicionado useLocation
 import { useAuth } from "@/contexts/AuthContext";
 import { Ticket, Loader2, Check, X } from "lucide-react";
 import { InputField } from "@/components/InputField";
@@ -24,6 +24,9 @@ export function LoginPage() {
 
     const { login, register } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const from = location.state?.from || "/";
 
     const isSubmitting = mode === AuthMode.SUBMITTING;
     const isLoginMode = mode === AuthMode.LOGIN;
@@ -57,7 +60,8 @@ export function LoginPage() {
 
                 await register(formData.name, formData.email, formData.password);
             }
-            navigate("/");
+
+            navigate(from, { replace: true });
         } catch (err: any) {
             setError(err.message);
             setMode(previousMode);

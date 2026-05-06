@@ -8,6 +8,7 @@ export interface Session {
     level: "beginner" | "intermediate" | "advanced";
     capacity: number;
     reserved: number;
+    isKeynote?: boolean;
 }
 
 export interface Track {
@@ -22,4 +23,14 @@ export interface Track {
         reserved: number;
     };
     sessions: Session[];
+}
+
+export interface Ticket {
+    id: string;
+    trackId: string;
+    trackTitle: string;
+    seatId: string | null;
+    category: "vip" | "standard" | "general";
+    purchaseDate: string;
+    eventDate: string;
 }

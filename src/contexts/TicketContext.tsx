@@ -1,38 +1,35 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
+import type { Ticket } from "../types/track";
 
 interface TicketContextData {
-    enrolledTracks: string[];
-    enrollInTrack: (trackId: string) => Promise<void>;
+    tickets: Ticket[];
+    addTicket: (ticket: Ticket) => void;
     isEnrolled: (trackId: string) => boolean;
 }
 
 const TicketContext = createContext<TicketContextData | undefined>(undefined);
 
-type TicketProps = { children: ReactNode };
-
-export function TicketProvider(props: TicketProps) {
-    const [enrolledTracks, setEnrolledTracks] = useState<string[]>(() => {
-        const stored = localStorage.getItem("@TechPass:enrolledTracks");
+export function TicketProvider({ children }: { children: ReactNode }) {
+    const [tickets, setTickets] = useState<Ticket[]>(() => {
+        const stored = localStorage.getItem("@TechPass:tickets");
         return stored ? JSON.parse(stored) : [];
     });
 
-    const commitTicketsChange = (newTracks: string[]) => {
-        localStorage.setItem("@TechPass:enrolledTracks", JSON.stringify(newTracks));
-        setEnrolledTracks(newTracks);
+    const commitTicketsChange = (newTickets: Ticket[]) => {
+        localStorage.setItem("@TechPass:tickets", JSON.stringify(newTickets));
+        setTickets(newTickets);
     };
 
-    const enrollInTrack = async (trackId: string) => {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        if (enrolledTracks.includes(trackId)) return;
-        const newTracks = [...enrolledTracks, trackId];
-        commitTicketsChange(newTracks);
+    const addTicket = (ticket: Ticket) => {
+        if (tickets.some((t) => t.trackId === ticket.trackId)) return;
+        commitTicketsChange([...tickets, ticket]);
     };
 
-    const isEnrolled = (trackId: string) => enrolledTracks.includes(trackId);
+    const isEnrolled = (trackId: string) => tickets.some((t) => t.trackId === trackId);
 
     return (
-        <TicketContext.Provider value={{ enrolledTracks, enrollInTrack, isEnrolled }}>
-            {props.children}
+        <TicketContext.Provider value={{ tickets, addTicket, isEnrolled }}>
+            {children}
         </TicketContext.Provider>
     );
 }

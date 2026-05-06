@@ -9,6 +9,8 @@ import { getTracks, getTrackById } from "./services/trackService"; // Importaç�
 import { getEventStats } from "./services/eventService";
 import "./index.css";
 import { TicketProvider } from "./contexts/TicketContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { SessionDetailsPage } from "./pages/SessionDetailsPage";
 
 const router = createBrowserRouter([
     {
@@ -39,14 +41,22 @@ const router = createBrowserRouter([
                     };
                 },
             },
+            {
+                path: "tracks/:trackId/sessions/:sessionId",
+                element: <SessionDetailsPage />,
+                loader: async ({ params }) => {
+                    const track = await getTrackById(params.trackId!);
+                    const session = track.sessions.find((s) => s.id === params.sessionId);
+                    if (!session) throw new Error("Sessão não encontrada");
+                    return { track, session };
+                },
+            },
         ],
     },
 ]);
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <TicketProvider>
-            <RouterProvider router={router} />
-        </TicketProvider>
+        <RouterProvider router={router} />
     </StrictMode>,
 );

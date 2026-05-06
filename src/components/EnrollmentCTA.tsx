@@ -1,23 +1,14 @@
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Track } from "@/types/track";
 
 interface EnrollmentCTAProps {
     track: Track;
     isEnrolled: boolean;
-    onEnroll: () => Promise<void>;
+    keynoteId?: string;
 }
 
-export function EnrollmentCTA(props: EnrollmentCTAProps) {
-    const { track, isEnrolled, onEnroll } = props;
-    const [isProcessing, setIsProcessing] = useState(false);
+export function EnrollmentCTA({ track, isEnrolled, keynoteId }: EnrollmentCTAProps) {
     const isSoldOut = track.auditorium.reserved >= track.auditorium.capacity;
-
-    const handleAction = async () => {
-        setIsProcessing(true);
-        await onEnroll();
-        setIsProcessing(false);
-    };
 
     return (
         <div
@@ -27,9 +18,7 @@ export function EnrollmentCTA(props: EnrollmentCTAProps) {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
                     <div
-                        className={`inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full mb-3 transition-colors ${isEnrolled
-                                ? "bg-green-100 text-green-700"
-                                : "bg-white/20 text-white backdrop-blur-md"
+                        className={`inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full mb-3 transition-colors ${isEnrolled ? "bg-green-100 text-green-700" : "bg-white/20 text-white backdrop-blur-md"
                             }`}
                     >
                         {isEnrolled ? "Inscrição Concluída" : "Passo 1 • Obrigatório"}
@@ -40,25 +29,22 @@ export function EnrollmentCTA(props: EnrollmentCTAProps) {
                     <p className={isEnrolled ? "text-gray-600" : "text-cobalt-200"}>
                         {isEnrolled
                             ? "Você já tem lugar reservado nos keynotes. Monte sua grade abaixo."
-                            : "Para acessar as sessões, você precisa primeiro reservar seu lugar no auditório principal."}
+                            : "Para liberar a trilha, você precisa primeiro reservar sua cadeira no Keynote de abertura."}
                     </p>
                 </div>
-                <button
-                    onClick={handleAction}
-                    disabled={isEnrolled || isSoldOut || isProcessing}
+
+                {/* O botão virou um Link para o Keynote */}
+                <Link
+                    to={isEnrolled || isSoldOut || !keynoteId ? "#" : `/tracks/${track.id}/sessions/${keynoteId}`}
                     className={`shrink-0 flex items-center justify-center min-w-55 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${isEnrolled
-                            ? "bg-green-100 text-green-700 cursor-default shadow-none"
-                            : "bg-white text-cobalt-900 hover:bg-gray-50 hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                            ? "bg-green-100 text-green-700 cursor-default shadow-none pointer-events-none"
+                            : isSoldOut
+                                ? "bg-gray-400 text-white cursor-not-allowed pointer-events-none"
+                                : "bg-white text-cobalt-900 hover:bg-gray-50 hover:-translate-y-1 hover:shadow-xl"
                         }`}
                 >
-                    {isProcessing ? (
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                    ) : isEnrolled ? (
-                        "Acesso Garantido ✓"
-                    ) : (
-                        "Comprar Acesso"
-                    )}
-                </button>
+                    {isEnrolled ? "Acesso Garantido ✓" : isSoldOut ? "Esgotado" : "Escolher Assento"}
+                </Link>
             </div>
         </div>
     );
