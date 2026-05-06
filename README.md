@@ -2,6 +2,8 @@
 
 Plataforma de venda de ingressos para o **Urban Innovation Summit** — uma conferência de tecnologia aplicada organizada em torno de um conceito central: cidades são sistemas vivos, e cada trilha temática representa uma camada crítica desse sistema.
 
+**[Demonstração online](https://luiz-filipe26.github.io/TechPass/)**
+
 > Projeto acadêmico desenvolvido para a disciplina de Interação Humano-Computador (IHC), com foco na aplicação das Heurísticas de Nielsen e em boas práticas de desenvolvimento front-end.
 
 ---
