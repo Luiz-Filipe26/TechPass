@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Await } from "react-router-dom";
+import { Await, useRevalidator } from "react-router-dom";
 import type { Track } from "../types/track";
 import { TrackCard } from "./TrackCard";
 
@@ -36,14 +36,7 @@ export function TracksSection({ tracksPromise }: TracksSectionProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <Suspense fallback={<TrackItemsSkeleton />}>
-                        <Await
-                            resolve={tracksPromise}
-                            errorElement={
-                                <p className="col-span-full text-center text-red-500 font-medium">
-                                    Erro ao carregar as trilhas. Por favor, tente novamente mais tarde.
-                                </p>
-                            }
-                        >
+                        <Await resolve={tracksPromise} errorElement={<TracksError />}>
                             {(resolvedTracks: Track[]) => (
                                 <>
                                     {resolvedTracks.map((track) => (
@@ -56,5 +49,15 @@ export function TracksSection({ tracksPromise }: TracksSectionProps) {
                 </div>
             </div>
         </section>
+    );
+}
+
+function TracksError() {
+    const { revalidate } = useRevalidator();
+    return (
+        <div className="col-span-full text-center">
+            <p className="text-red-500 font-medium mb-3">Erro ao carregar as trilhas.</p>
+            <button onClick={revalidate}>Tentar novamente</button>
+        </div>
     );
 }

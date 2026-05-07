@@ -5,6 +5,8 @@ interface TicketContextData {
     tickets: Ticket[];
     addTicket: (ticket: Ticket) => void;
     isEnrolled: (trackId: string) => boolean;
+    removeTicket: (ticketId: string) => void;
+    removeTrackTickets: (ticketId: string) => void;
 }
 
 const TicketContext = createContext<TicketContextData | undefined>(undefined);
@@ -25,9 +27,21 @@ export function TicketProvider({ children }: { children: ReactNode }) {
         commitTicketsChange([...tickets, ticket]);
     };
 
+    const removeTicket = (ticketId: string) => {
+        commitTicketsChange(tickets.filter((t) => t.id !== ticketId));
+    };
+
+    const removeTrackTickets = (trackId: string) => {
+        commitTicketsChange(tickets.filter((t) => t.trackId !== trackId));
+    };
+
     const isEnrolled = (trackId: string) => tickets.some((t) => t.trackId === trackId && t.category !== "general");
 
-    return <TicketContext.Provider value={{ tickets, addTicket, isEnrolled }}>{children}</TicketContext.Provider>;
+    return (
+        <TicketContext.Provider value={{ tickets, addTicket, isEnrolled, removeTicket, removeTrackTickets }}>
+            {children}
+        </TicketContext.Provider>
+    );
 }
 
 export function useTickets() {

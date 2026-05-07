@@ -5,6 +5,8 @@ import { useTickets } from "@/contexts/TicketContext";
 import { InputField } from "@/components/InputField";
 import type { TicketCategory } from "@/types/ticket";
 import { getTicketPrices, processTicketPayment, type PaymentData } from "@/services/ticketService";
+import toast from "react-hot-toast";
+import { StepIndicator } from "@/components/StepIndicator";
 
 interface CheckoutLocationState {
     trackId: string;
@@ -50,6 +52,7 @@ export function CheckoutPage() {
         setError(null);
 
         try {
+            if (!window.confirm("Confirmar pagamento?")) return;
             await processTicketPayment(paymentData, isFree);
 
             const newTicket = {
@@ -64,9 +67,22 @@ export function CheckoutPage() {
                 eventDate: checkoutData.eventDate,
             };
             addTicket(newTicket);
-            navigate("/profile", { replace: true });
-        } catch (err: any) {
-            setError(err.message || "Ocorreu um erro ao processar seu pagamento.");
+            toast.success(
+                <span>
+                    Ingresso confirmado!{" "}
+                    <button onClick={() => navigate("/profile")} className="underline font-bold text-cobalt-900 cursor-pointer">
+                        Ver no perfil →
+                    </button>
+                </span>,
+                { duration: 6000 },
+            );
+            navigate(`/tracks/${checkoutData.trackId}`);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Ocorreu um erro ao processar seu pagamento.");
+            }
             setIsProcessing(false);
         }
     };
@@ -99,6 +115,7 @@ function OrderSummary({ trackTitle, category, seatId, price, error }: OrderSumma
     return (
         <div className="space-y-6">
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Confirme seu Ingresso</h2>
+            <StepIndicator currentStep="seat" />
             {error && (
                 <div className="p-4 mb-6 rounded-xl bg-red-50 border border-red-100 text-red-600 font-medium animate-in fade-in zoom-in">
                     {error}
@@ -177,7 +194,14 @@ function PaymentForm({
                             label="Número do Cartão"
                             placeholder="0000 0000 0000 0000"
                             value={form.card}
-                            onChange={(e) => setForm({ ...form, card: e.target.value })}
+                            onChange={(e) => {
+                                const masked = e.target.value
+                                    .replace(/\D/g, "")
+                                    .slice(0, 16)
+                                    .replace(/(.{4})/g, "$1 ")
+                                    .trim();
+                                setForm({ ...form, card: masked });
+                            }}
                             name="card"
                             type="text"
                         />
@@ -194,7 +218,13 @@ function PaymentForm({
                                 label="Validade"
                                 placeholder="MM/AA"
                                 value={form.expiry}
-                                onChange={(e) => setForm({ ...form, expiry: e.target.value })}
+                                onChange={(e) => {
+                                    const masked = e.target.value
+                                        .replace(/\D/g, "")
+                                        .slice(0, 4)
+                                        .replace(/(\d{2})(\d)/, "$1/$2");
+                                    setForm({ ...form, expiry: masked });
+                                }}
                                 name="expiry"
                                 type="text"
                             />
@@ -202,7 +232,11 @@ function PaymentForm({
                                 label="CVV"
                                 placeholder="123"
                                 value={form.cvv}
-                                onChange={(e) => setForm({ ...form, cvv: e.target.value })}
+                                onChange={(e) => {
+                                    const masked = e.target.value.replace(/\D/g, "").slice(0, 3);
+
+                                    setForm({ ...form, cvv: masked });
+                                }}
                                 name="cvv"
                                 type="text"
                             />

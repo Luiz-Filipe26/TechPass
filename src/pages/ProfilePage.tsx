@@ -5,6 +5,7 @@ import { LogOut, Calendar, MapPin, Ticket as TicketIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTickets } from "@/contexts/TicketContext";
 import type { Ticket, TicketCategory } from "@/types/ticket";
+import type { User } from "@/types/auth";
 
 const categoryStyles: Record<TicketCategory, string> = {
     vip: "bg-amber-100 text-amber-700",
@@ -14,7 +15,7 @@ const categoryStyles: Record<TicketCategory, string> = {
 
 export function ProfilePage() {
     const { user, logout } = useAuth();
-    const { tickets } = useTickets();
+    const { tickets, removeTicket, removeTrackTickets } = useTickets();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -53,7 +54,12 @@ export function ProfilePage() {
                     ) : (
                         <div className="grid gap-6">
                             {upcoming.map((ticket) => (
-                                <TicketItem key={ticket.id} ticket={ticket} />
+                                <TicketItem
+                                    key={ticket.id}
+                                    ticket={ticket}
+                                    onRemove={() => removeTicket(ticket.id)}
+                                    onRemoveTrack={() => removeTrackTickets(ticket.trackId)}
+                                />
                             ))}
                         </div>
                     )}
@@ -64,7 +70,13 @@ export function ProfilePage() {
                         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">Encerrados</h2>
                         <div className="grid gap-6">
                             {past.map((ticket) => (
-                                <TicketItem key={ticket.id} ticket={ticket} isPast />
+                                <TicketItem
+                                    key={ticket.id}
+                                    ticket={ticket}
+                                    isPast
+                                    onRemove={() => removeTicket(ticket.id)}
+                                    onRemoveTrack={() => removeTrackTickets(ticket.trackId)}
+                                />
                             ))}
                         </div>
                     </section>
@@ -74,7 +86,7 @@ export function ProfilePage() {
     );
 }
 
-function ProfileHeader({ user, onLogout }: { user: any; onLogout: () => void }) {
+function ProfileHeader({ user, onLogout }: { user: User; onLogout: () => void }) {
     return (
         <div className="bg-white border-b border-gray-200 pt-12 pb-8">
             <div className="max-w-5xl mx-auto px-4 flex items-center justify-between">
@@ -98,7 +110,13 @@ function ProfileHeader({ user, onLogout }: { user: any; onLogout: () => void }) 
     );
 }
 
-function TicketItem({ ticket, isPast }: { ticket: Ticket; isPast?: boolean }) {
+type TicketItemProps = {
+    ticket: Ticket;
+    isPast?: boolean;
+    onRemove: () => void;
+    onRemoveTrack: () => void;
+};
+function TicketItem({ ticket, isPast, onRemove, onRemoveTrack }: TicketItemProps) {
     const badgeStyle = categoryStyles[ticket.category];
 
     return (
@@ -130,6 +148,22 @@ function TicketItem({ ticket, isPast }: { ticket: Ticket; isPast?: boolean }) {
                         </div>
                     )}
                 </div>
+                {!isPast && (
+                    <button
+                        onClick={() => {
+                            const isKeynote = ticket.category !== "general";
+                            const message = isKeynote
+                                ? "Cancelar o keynote vai remover TODOS os ingressos desta trilha. Confirmar?"
+                                : "Cancelar esta inscrição?";
+                            if (window.confirm(message)) {
+                                isKeynote ? onRemoveTrack() : onRemove();
+                            }
+                        }}
+                        className="mt-6 text-sm font-medium text-red-500 hover:text-red-700 border border-red-300 hover:border-red-500 px-4 py-2 rounded-xl transition-colors"
+                    >
+                        Cancelar inscrição
+                    </button>
+                )}
             </div>
 
             <div className="bg-gray-50 p-8 flex items-center justify-center border-t md:border-t-0 md:border-l border-gray-100">

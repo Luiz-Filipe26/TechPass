@@ -60,8 +60,12 @@ export function LoginPage() {
                 await register(formData.name, formData.email, formData.password);
             }
             navigate(from, { replace: true });
-        } catch (err: any) {
-            setError(err.message || "Ocorreu um erro na autenticação.");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Ocorreu um erro na autenticação.");
+            }
             setMode(previousMode);
         }
     };

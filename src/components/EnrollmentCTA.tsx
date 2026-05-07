@@ -48,6 +48,9 @@ export function EnrollmentCTA({ track, isEnrolled, keynoteId }: EnrollmentCTAPro
                             ? "Você já tem lugar reservado nos keynotes. Monte sua grade abaixo."
                             : "Para liberar a trilha, você precisa primeiro reservar sua cadeira no Keynote de abertura."}
                     </p>
+                    <p className="text-sm text-cobalt-400 mt-1">
+                        VIP: R$ 499 · Standard: R$ 299 · a escolha é feita na seleção do assento.
+                    </p>
                 </div>
 
                 <CTAAction isEnrolled={isEnrolled} isSoldOut={isSoldOut} trackId={track.id} keynoteId={keynoteId} />

@@ -1,11 +1,12 @@
 import { Suspense } from "react";
-import { useLoaderData, Await, Link, type LoaderFunctionArgs } from "react-router-dom";
+import { useLoaderData, Await, Link, type LoaderFunctionArgs, useRevalidator } from "react-router-dom";
 import type { Track } from "@/types/track";
 import { SessionCard } from "@/components/SessionCard";
 import { useTickets } from "@/contexts/TicketContext";
 import { TrackHero } from "@/components/TrackHero";
 import { EnrollmentCTA } from "@/components/EnrollmentCTA";
 import { getTrackById } from "@/services/trackService";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export function trackDetailsLoader({ params }: LoaderFunctionArgs) {
     if (!params.id) throw new Error("ID da trilha é obrigatório");
@@ -60,6 +61,7 @@ function TrackDetailsContent({ track }: { track: Track }) {
         <>
             <TrackHero track={track} />
             <MainContainer>
+                <Breadcrumbs crumbs={[{ label: "Início", to: "/" }, { label: track.title }]} />
                 <EnrollmentCTA track={track} isEnrolled={userHasAccess} keynoteId={keynoteSession?.id} />
 
                 <div>
@@ -95,12 +97,16 @@ const SkeletonBase = ({ className = "" }: { className?: string }) => (
 const HeroSkeleton = () => <SkeletonBase className="h-[60vh] min-h-100 w-full" />;
 const CTASkeleton = () => <SkeletonBase className="h-30 w-full rounded-3xl mb-16 shadow-sm border border-gray-100" />;
 
-const ErrorState = () => (
-    <div className="flex flex-col items-center justify-center text-center px-4 py-20">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Trilha não encontrada</h2>
-        <p className="text-gray-600">A trilha que você está procurando não existe ou foi removida.</p>
-        <Link to="/" className="mt-6 text-cobalt-600 font-medium hover:underline">
-            Voltar para o início
-        </Link>
-    </div>
-);
+const ErrorState = () => {
+    const { revalidate } = useRevalidator();
+    return (
+        <div className="flex flex-col items-center justify-center text-center px-4 py-20">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Trilha não encontrada</h2>
+            <p className="text-gray-600">A trilha que você está procurando não existe ou foi removida.</p>
+            <button onClick={revalidate}>Tentar novamente</button>
+            <Link to="/" className="mt-6 text-cobalt-600 font-medium hover:underline">
+                Voltar para o início
+            </Link>
+        </div>
+    );
+};

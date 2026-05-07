@@ -10,6 +10,8 @@ import { getTrackById } from "@/services/trackService";
 import type { TicketCategory } from "@/types/ticket";
 import type { Track, Session } from "@/types/track";
 import { getSeatMapLayout, type SeatMapLayout } from "@/services/seatService";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { StepIndicator } from "@/components/StepIndicator";
 
 export function sessionDetailsLoader({ params }: LoaderFunctionArgs) {
     const sessionPromise = getTrackById(params.trackId!).then((track) => {
@@ -149,9 +151,15 @@ function SessionHeaderInfo({ track, session }: { track: Track; session: Session 
             <button
                 onClick={() => navigate(-1)}
                 className="flex items-center gap-2 text-gray-500 hover:text-cobalt-600 mb-6 font-medium transition-colors"
-            >
-                <ArrowLeft className="w-5 h-5" /> Voltar para a trilha
-            </button>
+            ></button>
+            <StepIndicator currentStep="seat" />
+            <Breadcrumbs
+                crumbs={[
+                    { label: "Início", to: "/" },
+                    { label: track.title, to: `/tracks/${track.id}` },
+                    { label: session.title },
+                ]}
+            />
 
             <SessionTags session={session} />
 
@@ -203,7 +211,9 @@ function ActionHeader({ session }: { session: Session }) {
             <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
                 <p className="text-gray-600">{description}</p>
+                <p className="text-sm text-gray-400 mt-1">Fileiras da frente são VIP · demais são Standard.</p>
             </div>
+
             <AvailabilityIndicator
                 capacity={session.capacity}
                 reserved={session.reserved}
