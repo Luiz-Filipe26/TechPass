@@ -7,20 +7,6 @@ interface AboutSectionProps {
     statsPromise: Promise<EventStat[]>;
 }
 
-function StatItemsSkeleton() {
-    return (
-        <>
-            {[...Array(4)].map((_, i) => (
-                <div key={i} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col items-center">
-                    <div className="w-10 h-10 bg-gray-200 animate-pulse rounded-full mb-3" />
-                    <div className="h-8 w-20 bg-gray-200 animate-pulse rounded mb-2" />
-                    <div className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
-                </div>
-            ))}
-        </>
-    );
-}
-
 export function AboutSection({ statsPromise }: AboutSectionProps) {
     return (
         <section className="pt-12 pb-6 md:pt-8 md:pb-6 bg-white">
@@ -53,5 +39,19 @@ export function AboutSection({ statsPromise }: AboutSectionProps) {
                 </div>
             </div>
         </section>
+    );
+}
+
+function StatItemsSkeleton() {
+    return (
+        <>
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col items-center">
+                    <div className="w-10 h-10 bg-gray-200 animate-pulse rounded-full mb-3" />
+                    <div className="h-8 w-20 bg-gray-200 animate-pulse rounded mb-2" />
+                    <div className="h-4 w-24 bg-gray-100 animate-pulse rounded" />
+                </div>
+            ))}
+        </>
     );
 }

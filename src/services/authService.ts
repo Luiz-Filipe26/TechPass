@@ -27,7 +27,8 @@ export const authService = {
                     return;
                 }
 
-                const newUser = { id: crypto.randomUUID(), name, email, password };
+                const id = crypto.randomUUID();
+                const newUser = { id, name, email, password };
                 db.push(newUser);
                 localStorage.setItem("@TechPass:users", JSON.stringify(db));
 

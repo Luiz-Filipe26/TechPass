@@ -12,6 +12,48 @@ interface SessionCardProps {
     isSoldOut?: boolean;
 }
 
+export function SessionCard(props: SessionCardProps) {
+    const { session, trackId, isDisabled, isReserved, isSoldOut } = props;
+    const isInactive = isDisabled || isReserved || isSoldOut;
+
+    const hoverTitle = getHoverTitle(session.title, isDisabled, isReserved, isSoldOut);
+
+    const baseStyles = "relative block overflow-hidden rounded-2xl border transition-all bg-white";
+
+    const CardInner = (
+        <div className="p-6 flex flex-col md:flex-row gap-6 relative z-0">
+            {isInactive && <div className="absolute inset-0 bg-gray-600/10 pointer-events-none z-10" />}
+            <SessionTimeInfo date={session.date} time={session.time} />
+            <SessionMainContent {...props} />
+        </div>
+    );
+
+    if (isInactive) {
+        return (
+            <div className={`${baseStyles} border-gray-300 cursor-default`} title={hoverTitle}>
+                {CardInner}
+            </div>
+        );
+    }
+
+    return (
+        <Link
+            to={`/tracks/${trackId}/sessions/${session.id}`}
+            className={`${baseStyles} border-gray-200 hover:border-cobalt-300 hover:shadow-lg hover:-translate-y-1`}
+            title={hoverTitle}
+        >
+            {CardInner}
+        </Link>
+    );
+}
+
+function getHoverTitle(title: string, isDisabled: boolean, isReserved?: boolean, isSoldOut?: boolean) {
+    if (isReserved) return "Sua vaga já está garantida para esta sessão!";
+    if (isSoldOut) return "Infelizmente as vagas para esta sessão esgotaram.";
+    if (isDisabled) return "Você precisa garantir o passe da trilha no Keynote antes de reservar esta sessão.";
+    return `Clique para reservar vaga em: ${title}`;
+}
+
 function SessionTimeInfo({ date, time }: { date: string; time: string }) {
     const formattedDate = date.split("-").reverse().join("/");
 
@@ -29,44 +71,20 @@ function SessionTimeInfo({ date, time }: { date: string; time: string }) {
     );
 }
 
-function SessionMainContent({
-    session,
-    isDisabled,
-    isReserved,
-    isSoldOut,
-}: {
-    session: Session;
-    isDisabled: boolean;
-    isReserved?: boolean;
-    isSoldOut?: boolean;
-}) {
+function SessionMainContent({ session, isDisabled, isReserved, isSoldOut }: SessionCardProps) {
     const format = formatMap[session.format];
     const level = levelMap[session.level];
+    const badgeStyles = "px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md";
 
     return (
         <div className="flex-1 w-full">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
                 <div className="flex flex-wrap gap-2">
-                    <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md ${format.color}`}>
-                        {format.label}
-                    </span>
-                    <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md ${level.color}`}>
-                        {level.label}
-                    </span>
+                    <span className={`${badgeStyles} ${format.color}`}>{format.label}</span>
+                    <span className={`${badgeStyles} ${level.color}`}>{level.label}</span>
                 </div>
 
-                {/* Status Destacado (Prioridade: Vaga Garantida > Esgotado) */}
-                {isReserved ? (
-                    <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md relative z-20">
-                        <CheckCircle2 className="w-4 h-4" />
-                        Vaga Garantida
-                    </span>
-                ) : isSoldOut ? (
-                    <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md relative z-20">
-                        <XCircle className="w-4 h-4" />
-                        Esgotado
-                    </span>
-                ) : null}
+                <StatusBadge isReserved={isReserved} isSoldOut={isSoldOut} />
             </div>
 
             <h4 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
@@ -75,50 +93,28 @@ function SessionMainContent({
             </h4>
 
             <p className="text-gray-600 text-sm mb-4 line-clamp-2">{session.description}</p>
-
             <AvailabilityIndicator capacity={session.capacity} reserved={session.reserved} />
         </div>
     );
 }
 
-export function SessionCard({ session, trackId, isDisabled, isReserved, isSoldOut }: SessionCardProps) {
-    // Nova lógica de Hover Title com as prioridades corretas
-    const hoverTitle = isReserved
-        ? "Sua vaga já está garantida para esta sessão!"
-        : isSoldOut
-        ? "Infelizmente as vagas para esta sessão esgotaram."
-        : isDisabled
-        ? "Você precisa garantir o passe da trilha no Keynote antes de reservar esta sessão."
-        : `Clique para reservar vaga em: ${session.title}`;
+function StatusBadge({ isReserved, isSoldOut }: { isReserved?: boolean; isSoldOut?: boolean }) {
+    const base =
+        "shrink-0 inline-flex items-center gap-1.5 px-3 py-1 text-white text-xs font-black uppercase tracking-widest rounded-full shadow-md z-20";
 
-    const baseContainerStyles = "relative block overflow-hidden rounded-2xl border transition-all bg-white";
-
-    // O card inativa se estiver Desabilitado, Reservado ou Esgotado
-    const isInactive = isDisabled || isReserved || isSoldOut;
-
-    if (isInactive) {
+    if (isReserved)
         return (
-            <div className={`${baseContainerStyles} border-gray-300 cursor-default`} title={hoverTitle}>
-                <div className="absolute inset-0 bg-gray-400/30 pointer-events-none z-10"></div>
-
-                <div className="p-6 flex flex-col md:flex-row gap-6 relative z-0">
-                    <SessionTimeInfo date={session.date} time={session.time} />
-                    <SessionMainContent session={session} isDisabled={isDisabled} isReserved={isReserved} isSoldOut={isSoldOut} />
-                </div>
-            </div>
+            <span className={`${base} bg-emerald-600`}>
+                <CheckCircle2 className="w-4 h-4" /> Vaga Garantida
+            </span>
         );
-    }
 
-    return (
-        <Link
-            to={`/tracks/${trackId}/sessions/${session.id}`}
-            className={`${baseContainerStyles} border-gray-200 hover:border-cobalt-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer`}
-            title={hoverTitle}
-        >
-            <div className="p-6 flex flex-col md:flex-row gap-6 relative z-0">
-                <SessionTimeInfo date={session.date} time={session.time} />
-                <SessionMainContent session={session} isDisabled={isDisabled} isReserved={isReserved} isSoldOut={isSoldOut} />
-            </div>
-        </Link>
-    );
+    if (isSoldOut)
+        return (
+            <span className={`${base} bg-red-600`}>
+                <XCircle className="w-4 h-4" /> Esgotado
+            </span>
+        );
+
+    return null;
 }

@@ -4,7 +4,7 @@ const iconMap: Record<string, LucideIcon> = {
     calendar: Calendar,
     users: Users,
     zap: Zap,
-    "map-pin": MapPin,
+    mapPin: MapPin,
 };
 
 export function getIcon(name: string): LucideIcon {

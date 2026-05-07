@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import type { Ticket } from "../types/track";
+import type { Ticket } from "../types/ticket";
 
 interface TicketContextData {
     tickets: Ticket[];

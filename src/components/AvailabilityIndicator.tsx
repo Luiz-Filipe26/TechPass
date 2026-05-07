@@ -28,6 +28,5 @@ export function AvailabilityIndicator({ capacity, reserved, className = "text-sm
 
     const { label, color } = thresholds.find((t) => occupancyRate >= t.min)!;
 
-    // Removemos o 'text-sm' fixo daqui e usamos a prop 'className'
     return <span className={`inline-flex items-center gap-1.5 ${color} ${className}`}>{label}</span>;
 }

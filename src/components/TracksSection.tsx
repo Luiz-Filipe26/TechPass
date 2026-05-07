@@ -10,7 +10,7 @@ interface TracksSectionProps {
 function TrackItemsSkeleton() {
     return (
         <>
-            {[...Array(6)].map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="border border-gray-100 rounded-2xl p-6 bg-white shadow-sm">
                     <div className="h-48 w-full bg-gray-200 animate-pulse rounded-xl mb-4" />
                     <div className="h-6 w-3/4 bg-gray-200 animate-pulse rounded mb-2" />
