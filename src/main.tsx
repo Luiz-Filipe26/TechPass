@@ -9,6 +9,7 @@ import { trackDetailsLoader, TrackDetailsPage } from "./pages/TrackDetailsPage";
 import { sessionDetailsLoader, SessionDetailsPage } from "./pages/SessionDetailsPage";
 import { checkoutLoader, CheckoutPage } from "./pages/CheckoutPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { GlobalError } from "./components/GlobalError";
 
 const basename = import.meta.env.BASE_URL;
 
@@ -17,6 +18,7 @@ const router = createBrowserRouter(
         {
             path: "/",
             element: <RootLayout />,
+            errorElement: <GlobalError />,
             children: [
                 {
                     index: true,

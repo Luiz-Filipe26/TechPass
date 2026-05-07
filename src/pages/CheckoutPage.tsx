@@ -32,6 +32,7 @@ export function CheckoutPage() {
     const { addTicket } = useTickets();
 
     const [isProcessing, setIsProcessing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const checkoutData = state as CheckoutLocationState | null;
 
@@ -46,23 +47,28 @@ export function CheckoutPage() {
 
     const handleConfirmCheckout = async (paymentData: PaymentData) => {
         setIsProcessing(true);
+        setError(null);
 
-        await processTicketPayment(paymentData, isFree);
+        try {
+            await processTicketPayment(paymentData, isFree);
 
-        const newTicket = {
-            id: crypto.randomUUID(),
-            trackId: checkoutData.trackId,
-            trackTitle: checkoutData.trackTitle,
-            sessionId: checkoutData.sessionId,
-            sessionTitle: checkoutData.sessionTitle || "Keynote de Abertura",
-            seatId: checkoutData.seatId,
-            category: checkoutData.category,
-            purchaseDate: new Date().toISOString(),
-            eventDate: checkoutData.eventDate,
-        };
-
-        addTicket(newTicket);
-        navigate("/profile", { replace: true });
+            const newTicket = {
+                id: crypto.randomUUID(),
+                trackId: checkoutData.trackId,
+                trackTitle: checkoutData.trackTitle,
+                sessionId: checkoutData.sessionId,
+                sessionTitle: checkoutData.sessionTitle || "Keynote de Abertura",
+                seatId: checkoutData.seatId,
+                category: checkoutData.category,
+                purchaseDate: new Date().toISOString(),
+                eventDate: checkoutData.eventDate,
+            };
+            addTicket(newTicket);
+            navigate("/profile", { replace: true });
+        } catch (err: any) {
+            setError(err.message || "Ocorreu um erro ao processar seu pagamento.");
+            setIsProcessing(false);
+        }
     };
 
     return (
@@ -73,6 +79,7 @@ export function CheckoutPage() {
                     category={checkoutData.category}
                     seatId={checkoutData.seatId}
                     price={price}
+                    error={error}
                 />
                 <PaymentForm isFree={isFree} isProcessing={isProcessing} onSubmit={handleConfirmCheckout} />
             </div>
@@ -85,12 +92,18 @@ type OrderSummaryProps = {
     category: TicketCategory;
     seatId: string | null;
     price: number;
+    error: string | null;
 };
 
-function OrderSummary({ trackTitle, category, seatId, price }: OrderSummaryProps) {
+function OrderSummary({ trackTitle, category, seatId, price, error }: OrderSummaryProps) {
     return (
         <div className="space-y-6">
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Confirme seu Ingresso</h2>
+            {error && (
+                <div className="p-4 mb-6 rounded-xl bg-red-50 border border-red-100 text-red-600 font-medium animate-in fade-in zoom-in">
+                    {error}
+                </div>
+            )}
 
             <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-4 mb-6">
