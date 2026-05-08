@@ -40,7 +40,11 @@ export function TracksSection({ tracksPromise }: TracksSectionProps) {
                             {(resolvedTracks: Track[]) => (
                                 <>
                                     {resolvedTracks.map((track) => (
-                                        <TrackCard key={track.id} {...track} />
+                                        <TrackCard
+                                            key={track.id}
+                                            {...track}
+                                            keynoteId={track.sessions.find((s) => s.isKeynote)?.id}
+                                        />
                                     ))}
                                 </>
                             )}

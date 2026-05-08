@@ -1,6 +1,6 @@
 import { useState, Suspense, use } from "react";
 import { useLoaderData, useNavigate, useLocation, type LoaderFunctionArgs } from "react-router-dom";
-import { Calendar, Clock, MapPin, User, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, MapPin, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTickets } from "@/contexts/TicketContext";
 import { formatMap, levelMap } from "@/utils/badges";
